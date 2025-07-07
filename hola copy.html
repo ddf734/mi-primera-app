@@ -1,0 +1,1532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestión Académica CBITS</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #c53030;
+            --primary-dark: #9b2c2c;
+            --secondary: #e53e3e;
+            --accent: #e02424;
+            --light-red: #fed7d7;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #fff5f5 0%, #fff0f0 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .section { display: none; }
+        .section.active { display: block; }
+        .red-bg { background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); }
+        .card-shadow { box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent) 0%, var(--primary) 100%); }
+        .btn-primary:hover { background: linear-gradient(135deg, #d03a3a 0%, #a02a2a 100%); }
+        .notification { position: fixed; top: 20px; right: 20px; z-index: 1000; min-width: 300px; }
+        .form-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(224, 36, 36, 0.2); }
+        .table-responsive { overflow-x: auto; }
+        table th, table td { min-width: 100px; }
+        
+        /* Logo CBITS */
+        .cbits-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .logo-container {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 16px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 1rem;
+            max-width: 280px;
+            width: 100%;
+        }
+        
+        .logo-text {
+            text-align: center;
+            color: white;
+            font-weight: 700;
+            margin-top: 10px;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        .logo-main {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .logo-sub {
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 600;
+            margin-top: 5px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .logo-small {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            padding: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-right: 15px;
+        }
+        
+        /* Estilos específicos para el formulario de registro */
+        .input-with-button { display: flex; }
+        .input-with-button input { 
+            flex: 1; 
+            padding: 14px; 
+            border: 1px solid #e2e8f0; 
+            border-radius: 10px 0 0 10px; 
+            font-size: 16px; 
+        }
+        .input-with-button button {
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            border-radius: 0 10px 10px 0; 
+            width: 50px; 
+            cursor: pointer; 
+            font-size: 18px; 
+        }
+        .items-container {
+            background: var(--light-red); 
+            border-radius: 10px; 
+            padding: 15px; 
+            margin-top: 10px; 
+            max-height: 150px; 
+            overflow-y: auto;
+        }
+        .item {
+            background: white; 
+            border: 1px solid #feb2b2; 
+            border-radius: 20px; 
+            padding: 8px 15px; 
+            margin: 5px; 
+            display: inline-flex; 
+            align-items: center; 
+            font-size: 14px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .item button {
+            background: none; 
+            border: none; 
+            color: #e53e3e; 
+            margin-left: 8px; 
+            cursor: pointer; 
+            font-size: 14px;
+        }
+        
+        /* Estilos para responsive */
+        @media (max-width: 768px) {
+            table th, table td { min-width: 80px; font-size: 0.75rem; }
+            .grid-cols-1-lg { grid-template-columns: 1fr; }
+            .flex-wrap { flex-wrap: wrap; }
+            .nav-btn { padding: 10px 8px; font-size: 0.9rem; }
+            .logo-main { font-size: 1.8rem; }
+            .logo-sub { font-size: 1rem; }
+        }
+        
+        /* Estilos para el logo personalizado */
+        .custom-logo {
+            max-width: 250px;
+            width: 100%;
+            height: auto;
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .dashboard-logo {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+        
+        /* Nuevos estilos rojos */
+        .red-header {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .red-nav {
+            background: var(--primary-dark);
+        }
+        
+        .red-btn {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .red-btn:hover {
+            background: var(--primary-dark);
+        }
+        
+        .table-header-red {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .red-section-title {
+            color: var(--primary-dark);
+            border-left: 4px solid var(--primary);
+            padding-left: 10px;
+        }
+        
+        .red-notification {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Nuevos estilos para la sección de horarios */
+        .time-slot {
+            position: relative;
+            min-height: 40px;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 8px 5px;
+            font-size: 0.8rem;
+        }
+        
+        .time-label {
+            position: absolute;
+            left: 5px;
+            top: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .class-event {
+            background: var(--light-red);
+            border-left: 4px solid var(--accent);
+            border-radius: 4px;
+            padding: 5px 5px 5px 35px;
+            margin: 2px 0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .class-event:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .time-selector {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .time-selector select {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+        }
+        
+        .time-info {
+            font-size: 0.9rem;
+            margin-top: 5px;
+            color: #666;
+        }
+        
+        .schedule-header {
+            background: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+        
+        /* Nuevos estilos para la sección de recuperación */
+        .recovery-info {
+            background: white;
+            border-radius: 0.5rem;
+            border: 1px solid #e53e3e;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        
+        .recovery-title {
+            color: #9b2c2c;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+        }
+        
+        .password-display {
+            font-weight: bold;
+            font-size: 1.1rem;
+            background: #fff5f5;
+            padding: 0.5rem;
+            border-radius: 0.25rem;
+            border: 1px dashed #e53e3e;
+            margin: 0.5rem 0;
+            color: #c53030;
+        }
+        
+        .warning-box {
+            background: #fffaf0;
+            border: 1px solid #f6ad55;
+            border-radius: 0.25rem;
+            padding: 0.75rem;
+            margin-top: 1rem;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+    <!-- Notificaciones -->
+    <div id="notification" class="notification hidden"></div>
+
+    <!-- Sección de Login/Registro -->
+    <section id="auth-section" class="section active w-full max-w-md">
+        <div class="bg-white rounded-2xl card-shadow overflow-hidden">
+            <!-- Encabezado con fondo rojo -->
+            <div class="red-bg py-6 px-6 text-center">
+                <div class="cbits-logo">
+                    <div class="logo-container">
+                        <!-- Logo CBITS personalizado -->
+                        <img src="https://i.ibb.co/C5PB0G9R/Imagen-de-Whats-App-2025-06-26-a-las-17-58-50-364e1632.jpg" alt="Logo CBITS" class="custom-logo">
+                    </div>
+                    <div class="logo-text">
+                        <div class="logo-main">CBTIS-216</div>
+                        <div class="logo-sub">CENTRO DE BACHILLERATO TECNOLÓGICO</div>
+                        <div class="mt-2 font-semibold text-xl">JUAN N. ÁLVAREZ</div>
+                        <div class="text-base mt-1">UEMSTIS</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="p-6 sm:p-8">
+                <!-- Login Form -->
+                <div id="login-form">
+                    <h2 class="text-2xl font-semibold mb-6 text-center text-red-800">Iniciar Sesión</h2>
+                    <form onsubmit="login(event)">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-envelope mr-2 text-red-600"></i>Correo Electrónico
+                            </label>
+                            <input type="email" id="login-correo" required class="w-full px-4 py-3 border border-red-200 rounded-lg form-input focus:outline-none transition-all" placeholder="Ingrese su correo">
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-lock mr-2 text-red-600"></i>Contraseña
+                            </label>
+                            <input type="password" id="login-password" required class="w-full px-4 py-3 border border-red-200 rounded-lg form-input focus:outline-none transition-all" placeholder="Ingrese su contraseña">
+                        </div>
+                        <button type="submit" class="w-full btn-primary text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105">
+                            <i class="fas fa-sign-in-alt mr-2"></i>Ingresar
+                        </button>
+                    </form>
+                    <div class="text-center mt-6 text-gray-600">
+                        <p class="mb-2">
+                            ¿No tienes cuenta? 
+                            <button onclick="showRegister()" class="text-red-600 hover:text-red-800 font-medium">Regístrate aquí</button>
+                        </p>
+                        <p>
+                            <button onclick="showRecovery()" class="text-red-600 hover:text-red-800 font-medium">
+                                ¿Olvidaste tu contraseña?
+                            </button>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Register Form Mejorado -->
+                <div id="register-form" style="display: none;">
+                    <h2 class="text-2xl font-semibold mb-6 text-center text-red-800">Registro de Docente</h2>
+                    <form onsubmit="register(event)" id="registrationForm">
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-user mr-2 text-red-600"></i>Nombre Completo
+                            </label>
+                            <input type="text" id="reg-nombre" required class="w-full px-4 py-3 border border-red-200 rounded-lg form-input focus:outline-none transition-all" placeholder="Nombre completo del docente">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-envelope mr-2 text-red-600"></i>Correo Electrónico
+                            </label>
+                            <input type="email" id="reg-correo" required class="w-full px-4 py-3 border border-red-200 rounded-lg form-input focus:outline-none transition-all" placeholder="Correo electrónico">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-lock mr-2 text-red-600"></i>Contraseña
+                            </label>
+                            <input type="password" id="reg-password" required class="w-full px-4 py-3 border border-red-200 rounded-lg form-input focus:outline-none transition-all" placeholder="Contraseña segura">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-graduation-cap mr-2 text-red-600"></i>Especialidad
+                            </label>
+                            <input type="text" id="reg-especialidad" required class="w-full px-4 py-3 border border-red-200 rounded-lg form-input focus:outline-none transition-all" placeholder="Especialidad del docente">
+                        </div>
+                        <div class="mb-4">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-book mr-2 text-red-600"></i>Materias que Imparte
+                            </label>
+                            <div class="input-with-button">
+                                <input type="text" id="materiaInput" placeholder="Escribe una materia" class="w-full">
+                                <button type="button" id="addMateriaBtn"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <div class="items-container" id="materiasContainer">
+                                <!-- Las materias se añadirán aquí -->
+                            </div>
+                        </div>
+                        <div class="mb-6">
+                            <label class="block text-gray-700 font-medium mb-2">
+                                <i class="fas fa-users mr-2 text-red-600"></i>Grupos
+                            </label>
+                            <div class="input-with-button">
+                                <input type="text" id="grupoInput" placeholder="Escribe un grupo (ej: 1A)" class="w-full">
+                                <button type="button" id="addGrupoBtn"><i class="fas fa-plus"></i></button>
+                            </div>
+                            <div class="items-container" id="gruposContainer">
+                                <!-- Los grupos se añadirán aquí -->
+                            </div>
+                        </div>
+                        <button type="submit" class="w-full btn-primary text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105">
+                            <i class="fas fa-user-plus mr-2"></i>Registrarse
+                        </button>
+                    </form>
+                    <p class="text-center mt-6 text-gray-600">
+                        ¿Ya tienes cuenta? 
+                        <button onclick="showLogin()" class="text-red-600 hover:text-red-800 font-medium">Inicia sesión aquí</button>
+                    </p>
+                </div>
+
+                <!-- Formulario de recuperación de contraseña -->
+                <div id="recovery-form" style="display: none;">
+                    <h2 class="text-2xl font-semibold mb-6 text-center text-red-800">Recuperar Contraseña</h2>
+                    <div class="mb-4">
+                        <label class="block text-gray-700 font-medium mb-2">
+                            <i class="fas fa-envelope mr-2 text-red-600"></i>Correo Electrónico
+                        </label>
+                        <input type="email" id="recovery-email" required class="w-full px-4 py-3 border border-red-200 rounded-lg form-input focus:outline-none transition-all" placeholder="Ingrese su correo">
+                    </div>
+                    <button onclick="sendRecovery()" class="w-full btn-primary text-white py-3 rounded-lg font-medium hover:shadow-lg transition-all transform hover:scale-105 mb-4">
+                        <i class="fas fa-paper-plane mr-2"></i>Recuperar Contraseña
+                    </button>
+                    <div id="recovery-instructions" class="hidden recovery-info">
+                        <!-- Las instrucciones de recuperación se mostrarán aquí -->
+                    </div>
+                    <p class="text-center mt-6 text-gray-600">
+                        <button onclick="showLogin()" class="text-red-600 hover:text-red-800 font-medium">
+                            <i class="fas fa-arrow-left mr-2"></i>Volver a inicio de sesión
+                        </button>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Principal -->
+    <section id="dashboard-section" class="section w-full">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="px-6 py-4">
+                <div class="flex items-center justify-between flex-wrap">
+                    <div class="flex items-center">
+                        <!-- Logo pequeño CBITS en el dashboard -->
+                        <div class="logo-small flex items-center justify-center">
+                            <img src="https://i.ibb.co/C5PB0G9R/Imagen-de-Whats-App-2025-06-26-a-las-17-58-50-364e1632.jpg" alt="Logo CBITS" class="dashboard-logo">
+                        </div>
+                        <div>
+                            <h1 class="text-xl font-bold text-red-800">Sistema Académico</h1>
+                            <p class="text-red-600 text-sm" id="welcome-message">Bienvenido</p>
+                        </div>
+                    </div>
+                    <button onclick="logout()" class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg transition-all mt-2 sm:mt-0">
+                        <i class="fas fa-sign-out-alt mr-2"></i>Cerrar Sesión
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="red-nav text-white">
+            <div class="px-6">
+                <div class="flex flex-wrap space-x-1 sm:space-x-8">
+                    <button onclick="showSection('horarios')" class="nav-btn py-4 px-2 border-b-2 border-transparent hover:border-red-300 transition-all active">
+                        <i class="fas fa-clock mr-2"></i>Horarios
+                    </button>
+                    <button onclick="showSection('observaciones')" class="nav-btn py-4 px-2 border-b-2 border-transparent hover:border-red-300 transition-all">
+                        <i class="fas fa-sticky-note mr-2"></i>Observaciones
+                    </button>
+                    <button onclick="showSection('perfil')" class="nav-btn py-4 px-2 border-b-2 border-transparent hover:border-red-300 transition-all">
+                        <i class="fas fa-user mr-2"></i>Perfil
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Contenido Principal -->
+        <main class="p-4 sm:p-6">
+            <!-- Sección Horarios -->
+            <div id="horarios-content" class="content-section">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Formulario de Horario (versión mejorada) -->
+                    <div class="bg-white rounded-lg card-shadow p-4 sm:p-6">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 red-section-title">
+                            <i class="fas fa-plus-circle mr-2 text-red-600"></i>Registrar Horario
+                        </h2>
+                        <form onsubmit="registrarHorario(event)">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Día</label>
+                                <select id="horario-dia" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                    <option value="">Seleccionar día</option>
+                                    <option value="Lunes">Lunes</option>
+                                    <option value="Martes">Martes</option>
+                                    <option value="Miércoles">Miércoles</option>
+                                    <option value="Jueves">Jueves</option>
+                                    <option value="Viernes">Viernes</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Horario</label>
+                                <div class="time-selector mb-2">
+                                    <select id="horario-hora-inicio" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                        <option value="">Hora inicio</option>
+                                        <option value="07:00">07:00</option>
+                                        <option value="08:00">08:00</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="12:00">12:00</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="15:00">15:00</option>
+                                    </select>
+                                    <select id="horario-hora-fin" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                        <option value="">Hora fin</option>
+                                        <option value="08:00">08:00</option>
+                                        <option value="09:00">09:00</option>
+                                        <option value="10:00">10:00</option>
+                                        <option value="11:00">11:00</option>
+                                        <option value="12:00">12:00</option>
+                                        <option value="13:00">13:00</option>
+                                        <option value="14:00">14:00</option>
+                                        <option value="15:00">15:00</option>
+                                    </select>
+                                </div>
+                                <p class="time-info text-sm text-gray-500">
+                                    <i class="fas fa-info-circle mr-1"></i>
+                                    Seleccione el rango de tiempo para su clase
+                                </p>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Materia</label>
+                                <select id="horario-materia" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                    <option value="">Seleccionar materia</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Grupo</label>
+                                <select id="horario-grupo" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                    <option value="">Seleccionar grupo</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-medium mb-2">Actividad</label>
+                                <textarea id="horario-actividad" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none h-24" placeholder="Descripción de la actividad a realizar"></textarea>
+                            </div>
+                            
+                            <div class="flex gap-4">
+                                <button type="submit" class="flex-1 btn-primary text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all">
+                                    <i class="fas fa-save mr-2"></i>Registrar Horario
+                                </button>
+                                <button type="button" onclick="clearHorarioForm()" class="px-6 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">
+                                    <i class="fas fa-eraser mr-2"></i>Limpiar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Tabla de Horarios (versión mejorada) -->
+                    <div class="bg-white rounded-lg card-shadow p-4 sm:p-6">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 red-section-title">
+                            <i class="fas fa-calendar-alt mr-2 text-red-600"></i>Mis Horarios
+                        </h2>
+                        <div class="flex justify-between items-center mb-4">
+                            <div>
+                                <h3 class="font-medium text-gray-700">Horario Semanal</h3>
+                                <p class="text-sm text-gray-500">Visualiza tus clases por día y hora</p>
+                            </div>
+                            <button onclick="loadHorarios()" class="bg-red-100 text-red-700 px-3 py-1 rounded-lg hover:bg-red-200 transition-colors">
+                                <i class="fas fa-sync-alt mr-1"></i>Actualizar
+                            </button>
+                        </div>
+                        
+                        <div class="table-responsive">
+                            <table class="min-w-full text-sm border">
+                                <thead>
+                                    <tr class="schedule-header">
+                                        <th class="border p-2 text-center">Hora</th>
+                                        <th class="border p-2">Lunes</th>
+                                        <th class="border p-2">Martes</th>
+                                        <th class="border p-2">Miércoles</th>
+                                        <th class="border p-2">Jueves</th>
+                                        <th class="border p-2">Viernes</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabla-horarios-body" class="bg-white">
+                                    <!-- Los horarios se cargarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Observaciones -->
+            <div id="observaciones-content" class="content-section hidden">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Formulario de Observación -->
+                    <div class="bg-white rounded-lg card-shadow p-4 sm:p-6">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 red-section-title">
+                            <i class="fas fa-plus-circle mr-2 text-red-600"></i>Nueva Observación
+                        </h2>
+                        <form onsubmit="registrarObservacion(event)">
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Grupo</label>
+                                <select id="obs-grupo" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                    <option value="">Seleccionar grupo</option>
+                                </select>
+                            </div>
+                            <div class="mb-4">
+                                <label class="block text-gray-700 font-medium mb-2">Fecha</label>
+                                <input type="date" id="obs-fecha" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                            </div>
+                            <div class="mb-6">
+                                <label class="block text-gray-700 font-medium mb-2">Observación</label>
+                                <textarea id="obs-texto" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none h-32" placeholder="Escriba su observación aquí..."></textarea>
+                            </div>
+                            <div class="flex gap-4">
+                                <button type="submit" class="flex-1 btn-primary text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all">
+                                    <i class="fas fa-save mr-2"></i>Guardar Observación
+                                </button>
+                                <button type="button" onclick="clearObservacionForm()" class="px-6 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">
+                                    <i class="fas fa-eraser mr-2"></i>Limpiar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Lista de Observaciones -->
+                    <div class="bg-white rounded-lg card-shadow p-4 sm:p-6">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 red-section-title">
+                            <i class="fas fa-eye mr-2 text-red-600"></i>Mis Observaciones
+                        </h2>
+                        <div class="mb-4">
+                            <select id="filtro-grupo-obs" onchange="filtrarObservaciones()" class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                <option value="">Todos los grupos</option>
+                            </select>
+                        </div>
+                        <div id="observaciones-lista" class="space-y-4 max-h-96 overflow-y-auto">
+                            <!-- Las observaciones se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sección Perfil -->
+            <div id="perfil-content" class="content-section hidden">
+                <div class="max-w-2xl mx-auto">
+                    <div class="bg-white rounded-lg card-shadow p-4 sm:p-6">
+                        <h2 class="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 red-section-title">
+                            <i class="fas fa-user-edit mr-2 text-red-600"></i>Mi Perfil
+                        </h2>
+                        <form onsubmit="actualizarPerfil(event)">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 font-medium mb-2">Nombre Completo</label>
+                                    <input type="text" id="perfil-nombre" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Correo Electrónico</label>
+                                    <input type="email" id="perfil-correo" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-gray-700 font-medium mb-2">Especialidad</label>
+                                    <input type="text" id="perfil-especialidad" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 font-medium mb-2">Materias que Imparte</label>
+                                    <input type="text" id="perfil-materias" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none" placeholder="Separadas por comas">
+                                </div>
+                                <div class="md:col-span-2">
+                                    <label class="block text-gray-700 font-medium mb-2">Grupos</label>
+                                    <input type="text" id="perfil-grupos" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none" placeholder="Separados por comas">
+                                </div>
+                            </div>
+                            <div class="mt-6 flex gap-4">
+                                <button type="submit" class="flex-1 btn-primary text-white py-2 rounded-lg font-medium hover:shadow-lg transition-all">
+                                    <i class="fas fa-save mr-2"></i>Actualizar Perfil
+                                </button>
+                                <button type="button" onclick="cambiarPassword()" class="px-6 bg-yellow-500 hover:bg-yellow-600 text-white py-2 rounded-lg transition-all">
+                                    <i class="fas fa-key mr-2"></i>Cambiar Contraseña
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </section>
+
+    <!-- Modal para cambiar contraseña -->
+    <div id="password-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg p-6 w-full max-w-md mx-4">
+            <h3 class="text-xl font-bold mb-4">Cambiar Contraseña</h3>
+            <form onsubmit="actualizarPassword(event)">
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Contraseña Actual</label>
+                    <input type="password" id="current-password" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                </div>
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Nueva Contraseña</label>
+                    <input type="password" id="new-password" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                </div>
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">Confirmar Nueva Contraseña</label>
+                    <input type="password" id="confirm-password" required class="w-full px-4 py-2 border border-red-200 rounded-lg form-input focus:outline-none">
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 btn-primary text-white py-2 rounded-lg font-medium">
+                        <i class="fas fa-save mr-2"></i>Cambiar
+                    </button>
+                    <button type="button" onclick="closePasswordModal()" class="px-6 bg-gray-500 hover:bg-gray-600 text-white py-2 rounded-lg transition-all">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let currentUser = null;
+        let editingHorario = null;
+        let editingObservacion = null;
+        let materias = [];
+        let grupos = [];
+
+        // Horas disponibles para los horarios
+        const horasDisponibles = [
+            "07:00", "08:00", "09:00", "10:00", 
+            "11:00", "12:00", "13:00", "14:00", 
+            "15:00", "16:00", "17:00"
+        ];
+
+        // Funciones de utilidad
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            
+            notification.innerHTML = `
+                <div class="${bgColor} text-white p-4 rounded-lg shadow-lg transform transition-all duration-300 translate-x-full">
+                    <div class="flex items-center justify-between">
+                        <span><i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'} mr-2"></i>${message}</span>
+                        <button onclick="hideNotification()" class="ml-4 text-white hover:text-gray-200">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            notification.classList.remove('hidden');
+            setTimeout(() => {
+                notification.querySelector('div').classList.remove('translate-x-full');
+            }, 100);
+            
+            setTimeout(() => {
+                hideNotification();
+            }, 5000);
+        }
+
+        function hideNotification() {
+            const notification = document.getElementById('notification');
+            const notificationDiv = notification.querySelector('div');
+            if (notificationDiv) {
+                notificationDiv.classList.add('translate-x-full');
+                setTimeout(() => {
+                    notification.classList.add('hidden');
+                }, 300);
+            }
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        // Funciones de autenticación
+        function showLogin() {
+            document.getElementById('login-form').style.display = 'block';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('recovery-form').style.display = 'none';
+        }
+
+        function showRegister() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'block';
+            document.getElementById('recovery-form').style.display = 'none';
+        }
+
+        function showRecovery() {
+            document.getElementById('login-form').style.display = 'none';
+            document.getElementById('register-form').style.display = 'none';
+            document.getElementById('recovery-form').style.display = 'block';
+            document.getElementById('recovery-instructions').classList.add('hidden');
+        }
+
+        function login(event) {
+            event.preventDefault();
+            
+            const correo = document.getElementById('login-correo').value.trim();
+            const password = document.getElementById('login-password').value;
+            
+            if (!correo || !password) {
+                showNotification('Por favor complete todos los campos', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.correo === correo && u.password === password);
+            
+            if (user) {
+                currentUser = user;
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                showDashboard();
+                showNotification(`¡Bienvenido ${user.nombre}!`, 'success');
+            } else {
+                showNotification('Correo o contraseña incorrectos', 'error');
+            }
+        }
+
+        function agregarMateria() {
+            const materiaInput = document.getElementById('materiaInput');
+            const materia = materiaInput.value.trim();
+            
+            if (materia && !materias.includes(materia)) {
+                materias.push(materia);
+                renderMaterias();
+                materiaInput.value = '';
+                materiaInput.focus();
+            }
+        }
+
+        function eliminarMateria(index) {
+            materias.splice(index, 1);
+            renderMaterias();
+        }
+
+        function renderMaterias() {
+            const materiasContainer = document.getElementById('materiasContainer');
+            materiasContainer.innerHTML = '';
+            
+            if (materias.length === 0) {
+                materiasContainer.innerHTML = '<p class="text-gray-500 text-center py-2">No hay materias agregadas</p>';
+                return;
+            }
+            
+            materias.forEach((materia, index) => {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.innerHTML = `
+                    ${materia}
+                    <button onclick="eliminarMateria(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                materiasContainer.appendChild(item);
+            });
+        }
+
+        function agregarGrupo() {
+            const grupoInput = document.getElementById('grupoInput');
+            const grupo = grupoInput.value.trim();
+            
+            if (grupo && !grupos.includes(grupo)) {
+                grupos.push(grupo);
+                renderGrupos();
+                grupoInput.value = '';
+                grupoInput.focus();
+            }
+        }
+
+        function eliminarGrupo(index) {
+            grupos.splice(index, 1);
+            renderGrupos();
+        }
+
+        function renderGrupos() {
+            const gruposContainer = document.getElementById('gruposContainer');
+            gruposContainer.innerHTML = '';
+            
+            if (grupos.length === 0) {
+                gruposContainer.innerHTML = '<p class="text-gray-500 text-center py-2">No hay grupos agregados</p>';
+                return;
+            }
+            
+            grupos.forEach((grupo, index) => {
+                const item = document.createElement('div');
+                item.className = 'item';
+                item.innerHTML = `
+                    ${grupo}
+                    <button onclick="eliminarGrupo(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+                gruposContainer.appendChild(item);
+            });
+        }
+
+        function register(event) {
+            event.preventDefault();
+            
+            const nombre = document.getElementById('reg-nombre').value.trim();
+            const correo = document.getElementById('reg-correo').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const especialidad = document.getElementById('reg-especialidad').value.trim();
+            
+            if (!nombre || !correo || !password || !especialidad || materias.length === 0 || grupos.length === 0) {
+                showNotification('Por favor complete todos los campos', 'error');
+                return;
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(correo)) {
+                showNotification('Por favor ingrese un correo válido', 'error');
+                return;
+            }
+
+            if (password.length < 6) {
+                showNotification('La contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            if (users.find(u => u.correo === correo)) {
+                showNotification('El correo ya está registrado', 'error');
+                return;
+            }
+
+            const newUser = {
+                id: generateId(),
+                nombre,
+                correo,
+                password,
+                especialidad,
+                materias: [...materias],
+                grupos: [...grupos],
+                fechaRegistro: new Date().toISOString()
+            };
+
+            users.push(newUser);
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            showNotification('Registro exitoso. Puede iniciar sesión ahora', 'success');
+            showLogin();
+            
+            // Limpiar formulario
+            document.getElementById('reg-nombre').value = '';
+            document.getElementById('reg-correo').value = '';
+            document.getElementById('reg-password').value = '';
+            document.getElementById('reg-especialidad').value = '';
+            materias = [];
+            grupos = [];
+            renderMaterias();
+            renderGrupos();
+        }
+
+        function sendRecovery() {
+            const correo = document.getElementById('recovery-email').value.trim();
+            
+            if (!correo) {
+                showNotification('Por favor ingrese su correo', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const user = users.find(u => u.correo === correo);
+            
+            if (!user) {
+                showNotification('No se encontró una cuenta asociada a este correo', 'error');
+                return;
+            }
+            
+            // Generar "correo" instantáneo en el navegador
+            const recoveryInfo = `
+                <div class="recovery-content">
+                    <h3 class="recovery-title">
+                        <i class="fas fa-key mr-2"></i>Recuperación de Contraseña
+                    </h3>
+                    <p class="mb-3">Hola <strong>${user.nombre}</strong>,</p>
+                    <p class="mb-3">Recibiste este mensaje porque solicitaste recuperar tu contraseña.</p>
+                    
+                    <div class="mb-3">
+                        <p>Tu contraseña actual es:</p>
+                        <div class="password-display">${user.password}</div>
+                    </div>
+                    
+                    <p class="mb-3">Te recomendamos cambiarla después de iniciar sesión.</p>
+                    
+                    <div class="warning-box">
+                        <i class="fas fa-exclamation-triangle text-yellow-500 mr-2"></i>
+                        <span>Este es un mensaje simulado. En un sistema real se enviaría un correo electrónico.</span>
+                    </div>
+                </div>
+            `;
+            
+            // Mostrar información directamente
+            document.getElementById('recovery-instructions').innerHTML = recoveryInfo;
+            document.getElementById('recovery-instructions').classList.remove('hidden');
+            
+            showNotification('Información de recuperación generada', 'success');
+        }
+
+        function logout() {
+            if (confirm('¿Está seguro que desea cerrar sesión?')) {
+                currentUser = null;
+                localStorage.removeItem('currentUser');
+                showAuth();
+                showNotification('Sesión cerrada correctamente', 'info');
+            }
+        }
+
+        // Funciones de navegación
+        function showAuth() {
+            document.getElementById('auth-section').classList.add('active');
+            document.getElementById('dashboard-section').classList.remove('active');
+        }
+
+        function showDashboard() {
+            document.getElementById('auth-section').classList.remove('active');
+            document.getElementById('dashboard-section').classList.add('active');
+            document.getElementById('welcome-message').textContent = `Bienvenido, ${currentUser.nombre}`;
+            
+            loadUserData();
+            showSection('horarios');
+        }
+
+        function showSection(section) {
+            // Ocultar todas las secciones de contenido
+            document.querySelectorAll('.content-section').forEach(el => el.classList.add('hidden'));
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(section + '-content').classList.remove('hidden');
+            
+            // Actualizar navegación
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active', 'border-red-300'));
+            event.target.classList.add('active', 'border-red-300');
+            
+            // Cargar datos específicos de la sección
+            if (section === 'horarios') {
+                loadHorarios();
+            } else if (section === 'observaciones') {
+                loadObservaciones();
+            } else if (section === 'perfil') {
+                loadPerfil();
+            }
+        }
+
+        // Funciones de carga de datos
+        function loadUserData() {
+            // Cargar materias y grupos en los selects
+            const materiaSelects = document.querySelectorAll('#horario-materia');
+            const grupoSelects = document.querySelectorAll('#horario-grupo, #obs-grupo, #filtro-grupo-obs');
+            
+            materiaSelects.forEach(select => {
+                select.innerHTML = '<option value="">Seleccionar materia</option>';
+                currentUser.materias.forEach(materia => {
+                    select.innerHTML += `<option value="${materia}">${materia}</option>`;
+                });
+            });
+            
+            grupoSelects.forEach(select => {
+                const defaultOption = select.id === 'filtro-grupo-obs' ? 'Todos los grupos' : 'Seleccionar grupo';
+                select.innerHTML = `<option value="">${defaultOption}</option>`;
+                currentUser.grupos.forEach(grupo => {
+                    select.innerHTML += `<option value="${grupo}">${grupo}</option>`;
+                });
+            });
+        }
+
+        // Funciones de horarios (versión mejorada)
+        function registrarHorario(event) {
+            event.preventDefault();
+            
+            const dia = document.getElementById('horario-dia').value;
+            const horaInicio = document.getElementById('horario-hora-inicio').value;
+            const horaFin = document.getElementById('horario-hora-fin').value;
+            const materia = document.getElementById('horario-materia').value;
+            const grupo = document.getElementById('horario-grupo').value;
+            const actividad = document.getElementById('horario-actividad').value.trim();
+            
+            if (!dia || !horaInicio || !horaFin || !materia || !grupo || !actividad) {
+                showNotification('Por favor complete todos los campos', 'error');
+                return;
+            }
+            
+            // Validar que la hora de inicio sea anterior a la hora de fin
+            const inicio = new Date(`2000-01-01T${horaInicio}:00`);
+            const fin = new Date(`2000-01-01T${horaFin}:00`);
+            if (inicio >= fin) {
+                showNotification('La hora de inicio debe ser anterior a la hora de fin', 'error');
+                return;
+            }
+            
+            // Crear rango de hora para almacenamiento
+            const hora = `${horaInicio} - ${horaFin}`;
+
+            const horarios = JSON.parse(localStorage.getItem('horarios') || '[]');
+            
+            // Verificar conflictos de horario
+            const conflicto = horarios.find(h => 
+                h.usuarioId === currentUser.id && 
+                h.dia === dia && 
+                (
+                    (horaInicio >= h.horaInicio && horaInicio < h.horaFin) ||
+                    (horaFin > h.horaInicio && horaFin <= h.horaFin) ||
+                    (horaInicio <= h.horaInicio && horaFin >= h.horaFin)
+                )
+            );
+            
+            if (conflicto) {
+                showNotification(`Conflicto de horario con ${conflicto.materia} (${conflicto.horaInicio} - ${conflicto.horaFin})`, 'error');
+                return;
+            }
+
+            if (editingHorario) {
+                // Actualizar horario existente
+                const index = horarios.findIndex(h => h.id === editingHorario.id);
+                horarios[index] = {
+                    ...editingHorario,
+                    dia,
+                    hora,
+                    horaInicio,
+                    horaFin,
+                    materia,
+                    grupo,
+                    actividad,
+                    fechaModificacion: new Date().toISOString()
+                };
+                showNotification('Horario actualizado correctamente', 'success');
+                editingHorario = null;
+            } else {
+                // Crear nuevo horario
+                const nuevoHorario = {
+                    id: generateId(),
+                    usuarioId: currentUser.id,
+                    dia,
+                    hora,
+                    horaInicio,
+                    horaFin,
+                    materia,
+                    grupo,
+                    actividad,
+                    fechaCreacion: new Date().toISOString()
+                };
+                horarios.push(nuevoHorario);
+                showNotification('Horario registrado correctamente', 'success');
+            }
+
+            localStorage.setItem('horarios', JSON.stringify(horarios));
+            clearHorarioForm();
+            loadHorarios();
+        }
+
+        function clearHorarioForm() {
+            document.getElementById('horario-dia').value = '';
+            document.getElementById('horario-hora-inicio').value = '';
+            document.getElementById('horario-hora-fin').value = '';
+            document.getElementById('horario-materia').value = '';
+            document.getElementById('horario-grupo').value = '';
+            document.getElementById('horario-actividad').value = '';
+            editingHorario = null;
+        }
+
+        function loadHorarios() {
+            const horarios = JSON.parse(localStorage.getItem('horarios') || '[]');
+            const userHorarios = horarios.filter(h => h.usuarioId === currentUser.id);
+
+            const dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes"];
+            
+            const body = document.getElementById('tabla-horarios-body');
+            body.innerHTML = '';
+
+            // Crear filas para cada hora disponible
+            horasDisponibles.forEach(hora => {
+                const fila = document.createElement('tr');
+                let celdas = `<td class="border p-2 text-center font-semibold bg-red-50">${hora}</td>`;
+                
+                dias.forEach(dia => {
+                    // Buscar clases que ocurran en este día y hora
+                    const clases = userHorarios.filter(h => 
+                        h.dia === dia && 
+                        hora >= h.horaInicio && 
+                        hora < h.horaFin
+                    );
+                    
+                    if (clases.length > 0) {
+                        const clase = clases[0]; // Solo mostrar la primera clase en este slot
+                        celdas += `
+                            <td class="border p-1">
+                                <div class="class-event" onclick="editarHorario('${clase.id}')">
+                                    <div class="font-semibold text-red-700">${clase.materia}</div>
+                                    <div class="text-xs">${clase.grupo}</div>
+                                    <div class="text-xs">${clase.horaInicio} - ${clase.horaFin}</div>
+                                </div>
+                            </td>`;
+                    } else {
+                        celdas += `<td class="border p-1"></td>`;
+                    }
+                });
+                
+                fila.innerHTML = celdas;
+                body.appendChild(fila);
+            });
+        }
+
+        function editarHorario(id) {
+            const horarios = JSON.parse(localStorage.getItem('horarios') || '[]');
+            const horario = horarios.find(h => h.id === id);
+            
+            if (horario) {
+                editingHorario = horario;
+                document.getElementById('horario-dia').value = horario.dia;
+                document.getElementById('horario-hora-inicio').value = horario.horaInicio;
+                document.getElementById('horario-hora-fin').value = horario.horaFin;
+                document.getElementById('horario-materia').value = horario.materia;
+                document.getElementById('horario-grupo').value = horario.grupo;
+                document.getElementById('horario-actividad').value = horario.actividad;
+                
+                showNotification('Horario cargado para edición', 'info');
+            }
+        }
+
+        function eliminarHorario(id) {
+            if (confirm('¿Está seguro que desea eliminar este horario?')) {
+                const horarios = JSON.parse(localStorage.getItem('horarios') || '[]');
+                const nuevosHorarios = horarios.filter(h => h.id !== id);
+                localStorage.setItem('horarios', JSON.stringify(nuevosHorarios));
+                loadHorarios();
+                showNotification('Horario eliminado correctamente', 'success');
+            }
+        }
+
+        // Funciones de observaciones
+        function registrarObservacion(event) {
+            event.preventDefault();
+            
+            const grupo = document.getElementById('obs-grupo').value;
+            const fecha = document.getElementById('obs-fecha').value;
+            const texto = document.getElementById('obs-texto').value.trim();
+            
+            if (!grupo || !fecha || !texto) {
+                showNotification('Por favor complete todos los campos', 'error');
+                return;
+            }
+
+            const observaciones = JSON.parse(localStorage.getItem('observaciones') || '[]');
+
+            if (editingObservacion) {
+                // Actualizar observación existente
+                const index = observaciones.findIndex(o => o.id === editingObservacion.id);
+                observaciones[index] = {
+                    ...editingObservacion,
+                    grupo,
+                    fecha,
+                    texto,
+                    fechaModificacion: new Date().toISOString()
+                };
+                showNotification('Observación actualizada correctamente', 'success');
+                editingObservacion = null;
+            } else {
+                // Crear nueva observación
+                const nuevaObservacion = {
+                    id: generateId(),
+                    usuarioId: currentUser.id,
+                    docente: currentUser.nombre,
+                    grupo,
+                    fecha,
+                    texto,
+                    fechaCreacion: new Date().toISOString()
+                };
+                observaciones.push(nuevaObservacion);
+                showNotification('Observación registrada correctamente', 'success');
+            }
+
+            localStorage.setItem('observaciones', JSON.stringify(observaciones));
+            clearObservacionForm();
+            loadObservaciones();
+        }
+
+        function clearObservacionForm() {
+            document.getElementById('obs-grupo').value = '';
+            document.getElementById('obs-fecha').value = '';
+            document.getElementById('obs-texto').value = '';
+            editingObservacion = null;
+        }
+
+        function loadObservaciones() {
+            const observaciones = JSON.parse(localStorage.getItem('observaciones') || '[]');
+            const userObservaciones = observaciones.filter(o => o.usuarioId === currentUser.id);
+            
+            filtrarObservaciones(userObservaciones);
+        }
+
+        function filtrarObservaciones(observaciones = null) {
+            if (!observaciones) {
+                const todasObservaciones = JSON.parse(localStorage.getItem('observaciones') || '[]');
+                observaciones = todasObservaciones.filter(o => o.usuarioId === currentUser.id);
+            }
+            
+            const filtroGrupo = document.getElementById('filtro-grupo-obs').value;
+            
+            let observacionesFiltradas = observaciones;
+            if (filtroGrupo) {
+                observacionesFiltradas = observaciones.filter(o => o.grupo === filtroGrupo);
+            }
+            
+            // Ordenar por fecha descendente
+            observacionesFiltradas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+            
+            const lista = document.getElementById('observaciones-lista');
+            
+            if (observacionesFiltradas.length === 0) {
+                lista.innerHTML = '<p class="text-gray-500 text-center py-8">No hay observaciones registradas</p>';
+                return;
+            }
+
+            lista.innerHTML = observacionesFiltradas.map(obs => `
+                <div class="border rounded-lg p-4 hover:shadow-md transition-all">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center mb-2">
+                                <span class="bg-red-100 text-red-800 px-2 py-1 rounded text-sm font-medium mr-2">
+                                    ${obs.grupo}
+                                </span>
+                                <span class="text-gray-500 text-sm">
+                                    ${new Date(obs.fecha).toLocaleDateString('es-ES')}
+                                </span>
+                            </div>
+                            <p class="text-gray-800">${obs.texto}</p>
+                            <p class="text-xs text-gray-500 mt-2">
+                                Registrado: ${new Date(obs.fechaCreacion).toLocaleString('es-ES')}
+                            </p>
+                        </div>
+                        <div class="flex gap-2 ml-4">
+                            <button onclick="editarObservacion('${obs.id}')" class="text-blue-600 hover:text-blue-800 p-1">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="eliminarObservacion('${obs.id}')" class="text-red-600 hover:text-red-800 p-1">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editarObservacion(id) {
+            const observaciones = JSON.parse(localStorage.getItem('observaciones') || '[]');
+            const observacion = observaciones.find(o => o.id === id);
+            
+            if (observacion) {
+                editingObservacion = observacion;
+                document.getElementById('obs-grupo').value = observacion.grupo;
+                document.getElementById('obs-fecha').value = observacion.fecha;
+                document.getElementById('obs-texto').value = observacion.texto;
+                
+                showNotification('Observación cargada para edición', 'info');
+            }
+        }
+
+        function eliminarObservacion(id) {
+            if (confirm('¿Está seguro que desea eliminar esta observación?')) {
+                const observaciones = JSON.parse(localStorage.getItem('observaciones') || '[]');
+                const nuevasObservaciones = observaciones.filter(o => o.id !== id);
+                localStorage.setItem('observaciones', JSON.stringify(nuevasObservaciones));
+                loadObservaciones();
+                showNotification('Observación eliminada correctamente', 'success');
+            }
+        }
+
+        // Funciones de perfil
+        function loadPerfil() {
+            document.getElementById('perfil-nombre').value = currentUser.nombre;
+            document.getElementById('perfil-correo').value = currentUser.correo;
+            document.getElementById('perfil-especialidad').value = currentUser.especialidad;
+            document.getElementById('perfil-materias').value = currentUser.materias.join(', ');
+            document.getElementById('perfil-grupos').value = currentUser.grupos.join(', ');
+        }
+
+        function actualizarPerfil(event) {
+            event.preventDefault();
+            
+            const nombre = document.getElementById('perfil-nombre').value.trim();
+            const correo = document.getElementById('perfil-correo').value.trim();
+            const especialidad = document.getElementById('perfil-especialidad').value.trim();
+            const materias = document.getElementById('perfil-materias').value.trim();
+            const grupos = document.getElementById('perfil-grupos').value.trim();
+            
+            if (!nombre || !correo || !especialidad || !materias || !grupos) {
+                showNotification('Por favor complete todos los campos', 'error');
+                return;
+            }
+
+            // Validar formato de correo
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(correo)) {
+                showNotification('Por favor ingrese un correo válido', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            
+            // Verificar si el correo ya existe (excepto el actual)
+            const usuarioExistente = users.find(u => u.correo === correo && u.id !== currentUser.id);
+            if (usuarioExistente) {
+                showNotification('El correo electrónico ya está en uso', 'error');
+                return;
+            }
+
+            // Actualizar usuario
+            const index = users.findIndex(u => u.id === currentUser.id);
+            users[index] = {
+                ...currentUser,
+                nombre,
+                correo,
+                especialidad,
+                materias: materias.split(',').map(m => m.trim()),
+                grupos: grupos.split(',').map(g => g.trim()),
+                fechaModificacion: new Date().toISOString()
+            };
+
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser = users[index];
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            document.getElementById('welcome-message').textContent = `Bienvenido, ${currentUser.nombre}`;
+            loadUserData();
+            showNotification('Perfil actualizado correctamente', 'success');
+        }
+
+        function cambiarPassword() {
+            document.getElementById('password-modal').classList.remove('hidden');
+        }
+
+        function closePasswordModal() {
+            document.getElementById('password-modal').classList.add('hidden');
+            document.getElementById('current-password').value = '';
+            document.getElementById('new-password').value = '';
+            document.getElementById('confirm-password').value = '';
+        }
+
+        function actualizarPassword(event) {
+            event.preventDefault();
+            
+            const currentPassword = document.getElementById('current-password').value;
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            
+            if (currentPassword !== currentUser.password) {
+                showNotification('La contraseña actual es incorrecta', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showNotification('La nueva contraseña debe tener al menos 6 caracteres', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showNotification('Las contraseñas nuevas no coinciden', 'error');
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            const index = users.findIndex(u => u.id === currentUser.id);
+            users[index].password = newPassword;
+            users[index].fechaModificacion = new Date().toISOString();
+
+            localStorage.setItem('users', JSON.stringify(users));
+            currentUser.password = newPassword;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            
+            closePasswordModal();
+            showNotification('Contraseña actualizada correctamente', 'success');
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            // Event listeners para botones de registro dinámico
+            document.getElementById('addMateriaBtn').addEventListener('click', agregarMateria);
+            document.getElementById('addGrupoBtn').addEventListener('click', agregarGrupo);
+            
+            // Permitir añadir con Enter
+            document.getElementById('materiaInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    agregarMateria();
+                }
+            });
+            
+            document.getElementById('grupoInput').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    agregarGrupo();
+                }
+            });
+            
+            // Renderizar inicialmente los contenedores vacíos
+            renderMaterias();
+            renderGrupos();
+            
+            // Verificar si hay usuario logueado
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showDashboard();
+            } else {
+                // Limpiar campos si no hay usuario logueado
+                document.getElementById('login-correo').value = '';
+                document.getElementById('login-password').value = '';
+            }
+            
+            // Establecer fecha actual en el campo de observaciones
+            document.getElementById('obs-fecha').value = new Date().toISOString().split('T')[0];
+            
+            // Agregar eventos de navegación
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const section = this.textContent.toLowerCase().trim();
+                    if (section.includes('horarios')) showSection('horarios');
+                    else if (section.includes('observaciones')) showSection('observaciones');
+                    else if (section.includes('perfil')) showSection('perfil');
+                });
+            });
+        });
+
+        // Manejo de errores global
+        window.addEventListener('error', function(e) {
+            console.error('Error:', e.error);
+            showNotification('Ha ocurrido un error inesperado', 'error');
+        });
+    </script>
+</body>
+</html>
